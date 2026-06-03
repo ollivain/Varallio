@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  background-color: #050817;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* PWA safe-area support (iPhone notch / home indicator) */
+body {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 132, 255, 0.15);
+  border-radius: 2px;
+}
+
+.glass-card {
+  /* Neutral, calm dark surface — less blue saturation so the card edge
+     reads as a tonal step, not a bluish border line. */
+  background: rgba(18, 21, 28, 0.95);
+  border: none;
+  outline: none;
+  border-radius: 12px;
+  /* Very subtle drop only — no glow, no edge ring. */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: background 0.15s ease;
+}
+
+.glass-card:hover {
+  /* Slight lift via background brightness only, never a border. */
+  background: rgba(22, 25, 33, 0.98);
+}

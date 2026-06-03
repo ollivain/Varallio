@@ -1,0 +1,128 @@
+import type { Watchlist } from "./types";
+
+/**
+ * Mock watchlist used to drive the dashboard's Seurantalista while there is no
+ * backend. Independent of the portfolio: it can track instruments the user does
+ * not own (e.g. Novo Nordisk, Microsoft, Rheinmetall).
+ *
+ * The first four items intentionally mirror the previous Seurantalista
+ * (NVIDIA, ASML, Fortum, Wärtsilä) with the same prices, so the visible UI
+ * stays familiar.
+ */
+export const mockWatchlist: Watchlist = {
+  id: "watchlist-main",
+  name: "Oma seurantalista",
+  updatedAt: "2026-06-01T08:00:00.000Z",
+  items: [
+    {
+      id: "watch-nvda",
+      name: "NVIDIA",
+      ticker: "NVDA",
+      assetType: "stock",
+      currency: "EUR",
+      currentPrice: 975.3,
+      previousClosePrice: 940.0,
+      exchange: "NASDAQ",
+      sector: "Teknologia",
+      region: "Yhdysvallat",
+      tags: ["AI", "Puolijohteet"],
+      addedAt: "2026-01-12T09:30:00.000Z",
+    },
+    {
+      id: "watch-asml",
+      name: "ASML",
+      ticker: "ASML",
+      assetType: "stock",
+      currency: "EUR",
+      currentPrice: 852.2,
+      previousClosePrice: 830.0,
+      exchange: "Euronext Amsterdam",
+      sector: "Teknologia",
+      region: "Eurooppa",
+      tags: ["Puolijohteet"],
+      addedAt: "2026-01-12T09:30:00.000Z",
+    },
+    {
+      id: "watch-fortum",
+      name: "Fortum",
+      ticker: "FORTUM",
+      assetType: "stock",
+      currency: "EUR",
+      currentPrice: 17.46,
+      previousClosePrice: 17.67,
+      exchange: "Nasdaq Helsinki",
+      sector: "Energia",
+      region: "Suomi",
+      addedAt: "2026-02-03T10:00:00.000Z",
+    },
+    {
+      id: "watch-wartsila",
+      name: "Wärtsilä",
+      ticker: "WRT1V",
+      assetType: "stock",
+      currency: "EUR",
+      currentPrice: 15.92,
+      previousClosePrice: 15.74,
+      exchange: "Nasdaq Helsinki",
+      sector: "Teollisuus",
+      region: "Suomi",
+      addedAt: "2026-02-03T10:00:00.000Z",
+    },
+    {
+      id: "watch-novo",
+      name: "Novo Nordisk",
+      ticker: "NVO",
+      assetType: "stock",
+      currency: "USD",
+      currentPrice: 142.3,
+      previousClosePrice: 140.1,
+      exchange: "NYSE",
+      sector: "Terveydenhuolto",
+      region: "Eurooppa",
+      tags: ["Lääketeollisuus"],
+      addedAt: "2026-03-18T08:45:00.000Z",
+    },
+    {
+      id: "watch-msft",
+      name: "Microsoft",
+      ticker: "MSFT",
+      assetType: "stock",
+      currency: "USD",
+      currentPrice: 431.2,
+      previousClosePrice: 427.85,
+      exchange: "NASDAQ",
+      sector: "Teknologia",
+      region: "Yhdysvallat",
+      tags: ["AI", "Pilvi"],
+      addedAt: "2026-03-18T08:45:00.000Z",
+    },
+    {
+      id: "watch-rheinmetall",
+      name: "Rheinmetall",
+      ticker: "RHM",
+      assetType: "stock",
+      currency: "EUR",
+      currentPrice: 521.4,
+      previousClosePrice: 511.2,
+      exchange: "Xetra",
+      sector: "Puolustus",
+      region: "Eurooppa",
+      addedAt: "2026-04-02T11:15:00.000Z",
+    },
+    {
+      id: "watch-iwda",
+      name: "iShares Core MSCI World",
+      ticker: "IWDA",
+      assetType: "etf",
+      currency: "EUR",
+      currentPrice: 102.5,
+      previousClosePrice: 101.05,
+      exchange: "Euronext Amsterdam",
+      region: "Globaali",
+      tags: ["Hajautus"],
+      addedAt: "2026-01-20T09:00:00.000Z",
+    },
+  ],
+};
+
+export default mockWatchlist;
