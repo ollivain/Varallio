@@ -51,3 +51,60 @@ body {
   /* Slight lift via background brightness only, never a border. */
   background: rgba(22, 25, 33, 0.98);
 }
+
+.dashboard-edit-grid {
+  margin-left: -12px;
+  margin-right: -12px;
+}
+
+.dashboard-widget-content > * {
+  min-height: 100%;
+}
+
+.dashboard-edit-grid.is-editing .dashboard-widget-content {
+  border: 1px dashed rgba(148, 163, 184, 0.24);
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.04), 0 0 22px rgba(99, 102, 241, 0.08);
+  cursor: grab;
+}
+
+.dashboard-edit-grid.is-editing .react-grid-item.react-draggable-dragging .dashboard-widget-content {
+  cursor: grabbing;
+  box-shadow: 0 0 0 1px rgba(129, 140, 248, 0.28), 0 16px 40px rgba(0, 0, 0, 0.34);
+}
+
+.dashboard-edit-grid .react-grid-placeholder {
+  background: rgba(99, 102, 241, 0.16);
+  border: 1px dashed rgba(165, 180, 252, 0.38);
+  border-radius: 12px;
+  opacity: 1;
+}
+
+.dashboard-edit-grid .react-resizable-handle {
+  bottom: 5px;
+  right: 5px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.74);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.dashboard-edit-grid.is-editing .react-resizable-handle {
+  opacity: 1;
+}
+
+.dashboard-edit-grid .react-resizable-handle::after {
+  right: 5px;
+  bottom: 5px;
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid rgba(203, 213, 225, 0.75);
+  border-bottom: 2px solid rgba(203, 213, 225, 0.75);
+}
+
+.dashboard-edit-grid .react-resizable-handle:hover {
+  background: rgba(30, 41, 59, 0.92);
+  border-color: rgba(165, 180, 252, 0.38);
+}

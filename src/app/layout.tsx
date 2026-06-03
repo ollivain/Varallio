@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
 import "./globals.css";
 import AuthGate from "@/components/AuthGate";
 

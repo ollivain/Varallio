@@ -31,6 +31,7 @@ import DataStatusCard from "@/components/DataStatusCard";
 import TodayBriefCard from "@/components/TodayBriefCard";
 import WatchlistResearchCard from "@/components/WatchlistResearchCard";
 import CompanySnapshotCard from "@/components/CompanySnapshotCard";
+import EditableDashboardGrid, { type DashboardWidgetConfig } from "@/components/dashboard/EditableDashboardGrid";
 import { buildDataHealthSummary } from "@/lib/dataStatus";
 import { fxRatesResponseToMap } from "@/lib/currency";
 import { buildCompanySnapshot } from "@/lib/company";
@@ -65,6 +66,7 @@ export default function DashboardPage() {
   const [editingTransaction, setEditingTransaction] = useState<import("@/lib/transactions").Transaction | undefined>(undefined);
   const [externalAgentPrompt, setExternalAgentPrompt] = useState<string | null>(null);
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
+  const [isDashboardEditing, setIsDashboardEditing] = useState(false);
 
   const {
     addTransaction,
@@ -318,6 +320,245 @@ export default function DashboardPage() {
     return { source: data.source, count: data.items.length };
   }
 
+  const dashboardWidgets: DashboardWidgetConfig[] = [
+    {
+      id: "today-brief",
+      content: (
+        <TodayBriefCard
+          alerts={alerts}
+          dataHealthSummary={dataHealthSummary}
+          hasPortfolioData={portfolio.holdings.length > 0 || transactions.length > 0}
+          marketDataSource={marketDataSource}
+          news={news}
+          newsSource={newsSource}
+          portfolio={portfolio}
+          rates={fxRateMap}
+          watchlist={watchlist}
+        />
+      ),
+    },
+    {
+      id: "onboarding",
+      content: (
+        <OnboardingChecklistCard
+          checklist={onboardingChecklist}
+          actions={{
+            onOpenHoldingsManager: () => setIsHoldingsManagerOpen(true),
+            onOpenWatchlistManager: () => setIsWatchlistManagerOpen(true),
+            onOpenImportCsv: () => setIsImportModalOpen(true),
+            onOpenEditGoals: () => setIsEditGoalsOpen(true),
+            onOpenDataControls: () => setIsDataControlsOpen(true),
+            onRefreshFx: refreshFxRates,
+          }}
+        />
+      ),
+    },
+    {
+      id: "portfolio-value",
+      content: (
+        <MetricCard
+          title="Salkun arvo"
+          value={formatCurrency(summary.totalValue)}
+          change={`${formatSignedPercent(summary.dayChangePercent)} tänään`}
+          positive={summary.dayChangeValue >= 0}
+          showSparkline
+        />
+      ),
+    },
+    {
+      id: "day-change",
+      content: (
+        <MetricCard
+          title="Päivän muutos"
+          value={formatSignedCurrency(summary.dayChangeValue)}
+          change={formatSignedPercent(summary.dayChangePercent)}
+          positive={summary.dayChangeValue >= 0}
+        />
+      ),
+    },
+    {
+      id: "total-return",
+      content: (
+        <MetricCard
+          title="Kokonaistuotto"
+          value={formatSignedCurrency(summary.totalReturnValue)}
+          change={formatSignedPercent(summary.totalReturnPercent)}
+          positive={summary.totalReturnValue >= 0}
+        />
+      ),
+    },
+    {
+      id: "performance",
+      content: (
+        <PerformanceSummaryCard
+          performance={performance}
+          onAddTransaction={handleOpenAddTransaction}
+        />
+      ),
+    },
+    {
+      id: "cashflow",
+      content: (
+        <PortfolioHistoryCard
+          historySummary={historySummary}
+          onAddTransaction={handleOpenAddTransaction}
+          onImportCSV={() => setIsImportModalOpen(true)}
+        />
+      ),
+    },
+    {
+      id: "insights",
+      content: (
+        <PortfolioInsightsCard
+          alerts={alerts}
+          allocationDrift={allocationDrift}
+          contributionPlan={contributionPlan}
+          historySummary={historySummary}
+          news={news}
+          newsSource={newsSource}
+          performance={performance}
+          portfolio={portfolio}
+          rates={fxRateMap}
+          watchlist={watchlist}
+        />
+      ),
+    },
+    {
+      id: "actions",
+      content: (
+        <ActionSuggestionsCard
+          alerts={alerts}
+          allocationDrift={allocationDrift}
+          contributionPlan={contributionPlan}
+          dataHealthSummary={dataHealthSummary}
+          marketDataSource={marketDataSource}
+          news={news}
+          newsSource={newsSource}
+          onAskAgent={setExternalAgentPrompt}
+          portfolio={portfolio}
+          rates={fxRateMap}
+          scenarioResult={currentScenarioResult}
+          watchlist={watchlist}
+        />
+      ),
+    },
+    {
+      id: "data-status",
+      content: <DataStatusCard summary={dataHealthSummary} />,
+    },
+    {
+      id: "company-snapshot",
+      content: (
+        <CompanySnapshotCard
+          onAskAgent={setExternalAgentPrompt}
+          onSelectSymbol={setSelectedSymbol}
+          portfolio={portfolio}
+          selectedSymbol={resolvedSymbol}
+          snapshot={selectedCompanySnapshot}
+          watchlist={watchlist}
+        />
+      ),
+    },
+    {
+      id: "watchlist-research",
+      content: (
+        <WatchlistResearchCard
+          news={news}
+          onAskAgent={setExternalAgentPrompt}
+          onSelectSymbol={setSelectedSymbol}
+          portfolio={portfolio}
+          rates={fxRateMap}
+          watchlist={watchlist}
+        />
+      ),
+    },
+    {
+      id: "allocation-targets",
+      content: (
+        <AllocationTargetsCard
+          allocationDrift={allocationDrift}
+          goalSettings={goalSettings}
+          onEdit={() => setIsEditGoalsOpen(true)}
+        />
+      ),
+    },
+    {
+      id: "allocation",
+      content: <AllocationCard portfolio={portfolio} rates={fxRateMap} />,
+    },
+    {
+      id: "rebalance",
+      content: (
+        <RebalancePlannerCard
+          allocationDrift={allocationDrift}
+          goalSettings={goalSettings}
+          onAskAgent={setExternalAgentPrompt}
+          totalPortfolioValue={portfolioTotalValue}
+        />
+      ),
+    },
+    {
+      id: "scenario",
+      content: (
+        <ScenarioSimulatorCard
+          allocationDrift={allocationDrift}
+          baseAllocation={baseAllocation}
+          fxSource={fxRates.source}
+          goalSettings={goalSettings}
+          onAskAgent={setExternalAgentPrompt}
+          onScenarioResult={setCurrentScenarioResult}
+          portfolio={portfolio}
+          rates={fxRateMap}
+        />
+      ),
+    },
+    {
+      id: "watchlist",
+      content: (
+        <WatchlistCard
+          watchlist={watchlist}
+          onManage={() => setIsWatchlistManagerOpen(true)}
+        />
+      ),
+    },
+    {
+      id: "transactions",
+      content: (
+        <TransactionsCard
+          transactions={transactions}
+          onAddTransaction={handleOpenAddTransaction}
+          onEditTransaction={handleEditTransaction}
+          onImportCSV={() => setIsImportModalOpen(true)}
+          onRemoveTransaction={removeTransaction}
+        />
+      ),
+    },
+    {
+      id: "news",
+      content: (
+        <NewsCard
+          news={news}
+          newsSource={newsSource}
+          portfolio={portfolio}
+          rates={fxRateMap}
+          watchlist={watchlist}
+          onManage={() => setIsNewsManagerOpen(true)}
+        />
+      ),
+    },
+    {
+      id: "alerts",
+      content: (
+        <AlertsCard
+          alerts={alerts}
+          portfolio={portfolio}
+          watchlist={watchlist}
+          onManage={() => setIsAlertsManagerOpen(true)}
+        />
+      ),
+    },
+  ];
+
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: "#050817" }}>
       {/* Sidebar: 72 px fixed */}
@@ -375,6 +616,20 @@ export default function DashboardPage() {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
+                    onClick={() => setIsDashboardEditing((current) => !current)}
+                    className="rounded-lg px-3 py-2 text-xs font-semibold transition-colors hover:bg-white/[0.06]"
+                    style={{
+                      background: isDashboardEditing ? "rgba(34,197,94,0.12)" : "rgba(99,102,241,0.1)",
+                      color: isDashboardEditing ? "rgba(187,247,208,0.9)" : "rgba(196,181,253,0.88)",
+                      border: isDashboardEditing
+                        ? "1px solid rgba(74,222,128,0.2)"
+                        : "1px solid rgba(139,92,246,0.16)",
+                    }}
+                  >
+                    {isDashboardEditing ? "Valmis" : "Muokkaa näkymää"}
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => setIsDataControlsOpen(true)}
                     className="rounded-lg px-3 py-2 text-xs font-semibold transition-colors hover:bg-white/[0.06]"
                     style={{
@@ -400,181 +655,11 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* ── 1. Today's brief ─────────────────────────────────────── */}
-              <TodayBriefCard
-                alerts={alerts}
-                dataHealthSummary={dataHealthSummary}
-                hasPortfolioData={portfolio.holdings.length > 0 || transactions.length > 0}
-                marketDataSource={marketDataSource}
-                news={news}
-                newsSource={newsSource}
-                portfolio={portfolio}
-                rates={fxRateMap}
-                watchlist={watchlist}
+              {/* ── Editable dashboard widgets ───────────────────────────── */}
+              <EditableDashboardGrid
+                isEditing={isDashboardEditing}
+                widgets={dashboardWidgets}
               />
-
-              {/* ── 2. Onboarding checklist ───────────────────────────────── */}
-              <OnboardingChecklistCard
-                checklist={onboardingChecklist}
-                actions={{
-                  onOpenHoldingsManager: () => setIsHoldingsManagerOpen(true),
-                  onOpenWatchlistManager: () => setIsWatchlistManagerOpen(true),
-                  onOpenImportCsv: () => setIsImportModalOpen(true),
-                  onOpenEditGoals: () => setIsEditGoalsOpen(true),
-                  onOpenDataControls: () => setIsDataControlsOpen(true),
-                  onRefreshFx: refreshFxRates,
-                }}
-              />
-
-              {/* ── 2. Key metrics ───────────────────────────────────────── */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <MetricCard
-                  title="Salkun arvo"
-                  value={formatCurrency(summary.totalValue)}
-                  change={`${formatSignedPercent(summary.dayChangePercent)} tänään`}
-                  positive={summary.dayChangeValue >= 0}
-                  showSparkline
-                />
-                <MetricCard
-                  title="Päivän muutos"
-                  value={formatSignedCurrency(summary.dayChangeValue)}
-                  change={formatSignedPercent(summary.dayChangePercent)}
-                  positive={summary.dayChangeValue >= 0}
-                />
-                <MetricCard
-                  title="Kokonaistuotto"
-                  value={formatSignedCurrency(summary.totalReturnValue)}
-                  change={formatSignedPercent(summary.totalReturnPercent)}
-                  positive={summary.totalReturnValue >= 0}
-                />
-              </div>
-
-              {/* ── 3. Performance summary + history ─────────────────────── */}
-              <PerformanceSummaryCard
-                performance={performance}
-                onAddTransaction={handleOpenAddTransaction}
-              />
-
-              <PortfolioHistoryCard
-                historySummary={historySummary}
-                onAddTransaction={handleOpenAddTransaction}
-                onImportCSV={() => setIsImportModalOpen(true)}
-              />
-
-              {/* ── 4. Intelligence: insights + next steps ───────────────── */}
-              <PortfolioInsightsCard
-                alerts={alerts}
-                allocationDrift={allocationDrift}
-                contributionPlan={contributionPlan}
-                historySummary={historySummary}
-                news={news}
-                newsSource={newsSource}
-                performance={performance}
-                portfolio={portfolio}
-                rates={fxRateMap}
-                watchlist={watchlist}
-              />
-
-              <ActionSuggestionsCard
-                alerts={alerts}
-                allocationDrift={allocationDrift}
-                contributionPlan={contributionPlan}
-                dataHealthSummary={dataHealthSummary}
-                marketDataSource={marketDataSource}
-                news={news}
-                newsSource={newsSource}
-                onAskAgent={setExternalAgentPrompt}
-                portfolio={portfolio}
-                rates={fxRateMap}
-                scenarioResult={currentScenarioResult}
-                watchlist={watchlist}
-              />
-
-              {/* ── 4. Data status ────────────────────────────────────────── */}
-              <DataStatusCard summary={dataHealthSummary} />
-
-              {/* ── 5. Company snapshot ──────────────────────────────────────── */}
-              <CompanySnapshotCard
-                onAskAgent={setExternalAgentPrompt}
-                onSelectSymbol={setSelectedSymbol}
-                portfolio={portfolio}
-                selectedSymbol={resolvedSymbol}
-                snapshot={selectedCompanySnapshot}
-                watchlist={watchlist}
-              />
-
-              {/* ── 6. Watchlist research ─────────────────────────────────────── */}
-              <WatchlistResearchCard
-                news={news}
-                onAskAgent={setExternalAgentPrompt}
-                onSelectSymbol={setSelectedSymbol}
-                portfolio={portfolio}
-                rates={fxRateMap}
-                watchlist={watchlist}
-              />
-
-              {/* ── 7. Allocation targets + allocation chart ─────────────────── */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <AllocationTargetsCard
-                  allocationDrift={allocationDrift}
-                  goalSettings={goalSettings}
-                  onEdit={() => setIsEditGoalsOpen(true)}
-                />
-                <AllocationCard portfolio={portfolio} rates={fxRateMap} />
-              </div>
-
-              {/* ── 8. Rebalance / contribution planner ─────────────────────── */}
-              <RebalancePlannerCard
-                allocationDrift={allocationDrift}
-                goalSettings={goalSettings}
-                onAskAgent={setExternalAgentPrompt}
-                totalPortfolioValue={portfolioTotalValue}
-              />
-
-              {/* ── 9. Scenario simulator ────────────────────────────────────── */}
-              <ScenarioSimulatorCard
-                allocationDrift={allocationDrift}
-                baseAllocation={baseAllocation}
-                fxSource={fxRates.source}
-                goalSettings={goalSettings}
-                onAskAgent={setExternalAgentPrompt}
-                onScenarioResult={setCurrentScenarioResult}
-                portfolio={portfolio}
-                rates={fxRateMap}
-              />
-
-              {/* ── 10. Watchlist list ───────────────────────────────────────── */}
-              <WatchlistCard
-                watchlist={watchlist}
-                onManage={() => setIsWatchlistManagerOpen(true)}
-              />
-
-              {/* ── 8. Transactions ──────────────────────────────────────────── */}
-              <TransactionsCard
-                transactions={transactions}
-                onAddTransaction={handleOpenAddTransaction}
-                onEditTransaction={handleEditTransaction}
-                onImportCSV={() => setIsImportModalOpen(true)}
-                onRemoveTransaction={removeTransaction}
-              />
-
-              {/* ── 8. News + alerts ──────────────────────────────────────── */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <NewsCard
-                  news={news}
-                  newsSource={newsSource}
-                  portfolio={portfolio}
-                  rates={fxRateMap}
-                  watchlist={watchlist}
-                  onManage={() => setIsNewsManagerOpen(true)}
-                />
-                <AlertsCard
-                  alerts={alerts}
-                  portfolio={portfolio}
-                  watchlist={watchlist}
-                  onManage={() => setIsAlertsManagerOpen(true)}
-                />
-              </div>
 
               {/* ── Disclaimer ────────────────────────────────────────────── */}
               <p
