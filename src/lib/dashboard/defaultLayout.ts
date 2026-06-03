@@ -19,6 +19,7 @@ export const DASHBOARD_COLS = {
 export type DashboardBreakpoint = keyof typeof DASHBOARD_COLS;
 
 export type DashboardWidgetId =
+  | "assistant"
   | "today-brief"
   | "onboarding"
   | "portfolio-value"
@@ -41,6 +42,7 @@ export type DashboardWidgetId =
   | "alerts";
 
 export const DASHBOARD_WIDGET_IDS: DashboardWidgetId[] = [
+  "assistant",
   "today-brief",
   "onboarding",
   "portfolio-value",
@@ -64,11 +66,12 @@ export const DASHBOARD_WIDGET_IDS: DashboardWidgetId[] = [
 ];
 
 const lg: Layout = [
-  { i: "today-brief", x: 0, y: 0, w: 12, h: 5, minW: 6, minH: 4 },
-  { i: "onboarding", x: 0, y: 5, w: 12, h: 4, minW: 6, minH: 3 },
-  { i: "portfolio-value", x: 0, y: 9, w: 4, h: 3, minW: 3, minH: 2 },
-  { i: "day-change", x: 4, y: 9, w: 4, h: 3, minW: 3, minH: 2 },
-  { i: "total-return", x: 8, y: 9, w: 4, h: 3, minW: 3, minH: 2 },
+  { i: "assistant", x: 0, y: 0, w: 4, h: 12, minW: 3, minH: 7 },
+  { i: "today-brief", x: 4, y: 0, w: 8, h: 5, minW: 5, minH: 4 },
+  { i: "onboarding", x: 4, y: 5, w: 8, h: 4, minW: 5, minH: 3 },
+  { i: "portfolio-value", x: 4, y: 9, w: 3, h: 3, minW: 2, minH: 2 },
+  { i: "day-change", x: 7, y: 9, w: 3, h: 3, minW: 2, minH: 2 },
+  { i: "total-return", x: 10, y: 9, w: 2, h: 3, minW: 2, minH: 2 },
   { i: "performance", x: 0, y: 12, w: 6, h: 5, minW: 4, minH: 4 },
   { i: "cashflow", x: 6, y: 12, w: 6, h: 5, minW: 4, minH: 4 },
   { i: "insights", x: 0, y: 17, w: 6, h: 6, minW: 4, minH: 4 },
@@ -87,11 +90,12 @@ const lg: Layout = [
 ];
 
 const md: Layout = [
-  { i: "today-brief", x: 0, y: 0, w: 8, h: 5, minW: 4, minH: 4 },
-  { i: "onboarding", x: 0, y: 5, w: 8, h: 4, minW: 4, minH: 3 },
-  { i: "portfolio-value", x: 0, y: 9, w: 3, h: 3, minW: 2, minH: 2 },
-  { i: "day-change", x: 3, y: 9, w: 3, h: 3, minW: 2, minH: 2 },
-  { i: "total-return", x: 6, y: 9, w: 2, h: 3, minW: 2, minH: 2 },
+  { i: "assistant", x: 0, y: 0, w: 3, h: 12, minW: 2, minH: 7 },
+  { i: "today-brief", x: 3, y: 0, w: 5, h: 5, minW: 3, minH: 4 },
+  { i: "onboarding", x: 3, y: 5, w: 5, h: 4, minW: 3, minH: 3 },
+  { i: "portfolio-value", x: 3, y: 9, w: 2, h: 3, minW: 1, minH: 2 },
+  { i: "day-change", x: 5, y: 9, w: 2, h: 3, minW: 1, minH: 2 },
+  { i: "total-return", x: 7, y: 9, w: 1, h: 3, minW: 1, minH: 2 },
   { i: "performance", x: 0, y: 12, w: 4, h: 5, minW: 3, minH: 4 },
   { i: "cashflow", x: 4, y: 12, w: 4, h: 5, minW: 3, minH: 4 },
   { i: "insights", x: 0, y: 17, w: 4, h: 6, minW: 3, minH: 4 },

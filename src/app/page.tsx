@@ -322,6 +322,31 @@ export default function DashboardPage() {
 
   const dashboardWidgets: DashboardWidgetConfig[] = [
     {
+      id: "assistant",
+      content: (
+        <AssistantPanel
+          alerts={alerts}
+          externalPrompt={externalAgentPrompt}
+          dataHealthSummary={dataHealthSummary}
+          fxRates={fxRates}
+          marketDataSource={marketDataSource}
+          news={news}
+          newsSource={newsSource}
+          onAgentSourceChange={(source) =>
+            updateAgentDataStatus(source === "ai" ? "live" : "mock")
+          }
+          onExternalPromptHandled={() => setExternalAgentPrompt(null)}
+          portfolio={portfolio}
+          rates={fxRateMap}
+          selectedCompanySnapshot={selectedCompanySnapshot}
+          transactions={transactions}
+          goalSettings={goalSettings}
+          scenarioResult={currentScenarioResult}
+          watchlist={watchlist}
+        />
+      ),
+    },
+    {
       id: "today-brief",
       content: (
         <TodayBriefCard
@@ -568,37 +593,9 @@ export default function DashboardPage() {
         <Header />
 
         <div className="flex flex-1 min-h-0 overflow-hidden">
-
-          {/* ── Assistant panel (desktop only) ─────────────────────────── */}
-          <div
-            className="hidden lg:flex flex-col p-3 shrink-0"
-            style={{ width: 380 }}
-          >
-            <AssistantPanel
-              alerts={alerts}
-              externalPrompt={externalAgentPrompt}
-              dataHealthSummary={dataHealthSummary}
-              fxRates={fxRates}
-              marketDataSource={marketDataSource}
-              news={news}
-              newsSource={newsSource}
-              onAgentSourceChange={(source) =>
-                updateAgentDataStatus(source === "ai" ? "live" : "mock")
-              }
-              onExternalPromptHandled={() => setExternalAgentPrompt(null)}
-              portfolio={portfolio}
-              rates={fxRateMap}
-              selectedCompanySnapshot={selectedCompanySnapshot}
-              transactions={transactions}
-              goalSettings={goalSettings}
-              scenarioResult={currentScenarioResult}
-              watchlist={watchlist}
-            />
-          </div>
-
           {/* ── Main dashboard content ──────────────────────────────────── */}
           <main className="flex-1 overflow-y-auto p-3 pb-6">
-            <div className="flex flex-col gap-3 max-w-5xl">
+            <div className="flex flex-col gap-3 max-w-7xl">
 
               {/* ── Page header ──────────────────────────────────────────── */}
               <div className="flex items-center justify-between gap-3">
