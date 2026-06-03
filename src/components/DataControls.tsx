@@ -11,6 +11,7 @@ import type { Transaction } from "@/lib/transactions";
 import type { Watchlist } from "@/lib/watchlist";
 import ApiSetupCard from "@/components/ApiSetupCard";
 import { createBackup } from "@/lib/backup";
+import { postLogout } from "@/components/AuthGate";
 
 const ASSISTANT_CHAT_STORAGE_KEY = "investment-os:assistant-chat";
 
@@ -484,7 +485,27 @@ export default function DataControls({
           )}
 
           {activeTab === "setup" && (
-            <ApiSetupCard />
+            <div className="flex flex-col gap-4">
+              <ApiSetupCard />
+              <div className="flex flex-col gap-2">
+                <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: "rgba(148,163,184,0.45)" }}>
+                  Istunto
+                </p>
+                <ControlButton
+                  tone="warning"
+                  onClick={() => {
+                    void postLogout().then(() => {
+                      window.location.reload();
+                    });
+                  }}
+                >
+                  Kirjaudu ulos
+                </ControlButton>
+                <p className="text-[11px] leading-relaxed" style={{ color: "rgba(148,163,184,0.56)" }}>
+                  Poistaa auth-cookien. Seuraava sivulataama pyytää salasanan uudelleen.
+                </p>
+              </div>
+            </div>
           )}
 
         </div>

@@ -14,12 +14,54 @@ Avaa http://localhost:3000.
 
 App toimii täysin ilman API-avaimia mock-datalla.
 
+## Sovelluksen suojaus (APP_PASSWORD)
+
+Investment OS on yksityinen omaan käyttöön tarkoitettu sovellus. Koko dashboard on suojattu yhdellä salasanalla.
+
+### Miten se toimii
+
+- Kirjautuminen tapahtuu login-näkymässä ennen kuin mitään muuta näytetään
+- Autentikointi tallennetaan `httpOnly`-cookieen (7 päivää), salasana ei tallennu clientille
+- Cookie-arvo on HMAC-SHA256(`APP_PASSWORD`, "investment-os") – ei pelkkä salasana
+- Kaikki API-routet vaativat validi auth-cookien; ilman sitä ne palauttavat 401
+
+### Paikalliset asetukset
+
+Lisää `.env.local`-tiedostoon:
+
+```
+APP_PASSWORD=valitse-vahva-salasana
+```
+
+Jos `APP_PASSWORD` puuttuu, sovellus näyttää konfigurointivirheen eikä päästä sisälle.
+
+### Vercel-asetukset
+
+Vercel-projektin asetuksissa: **Settings → Environment Variables → `APP_PASSWORD`**
+
+### Mitä suojaus kattaa
+
+- Dashboard UI: piilotettu ennen kirjautumista
+- API-routet: `/api/agent`, `/api/news`, `/api/market/quotes`, `/api/fx/rates`, `/api/config/status`
+- Ulkopuoliset eivät pysty käyttämään API-avaimiasi edes jos tietävät route-URLit
+
+### Mitä suojaus EI kata
+
+- Tämä ei ole monen käyttäjän auth – kaikki samalla salasanalla pääsevät kaikkeen
+- `localStorage`-data pysyy selaimessa (portfolio, transaktiot jne.)
+- AI-agentti lähettää kontekstiasi OpenAI API:lle jos `OPENAI_API_KEY` on käytössä
+
+### Uloskirjautuminen
+
+Dashboard: **Data → API & Asetukset → Kirjaudu ulos**
+
 ## Ympäristömuuttujat
 
 Lisää `.env.local`-tiedostoon. Avaimia ei lähetetä koskaan client-bundleen.
 
 | Muuttuja | Tarkoitus | Pakollinen |
 |---|---|---|
+| `APP_PASSWORD` | Dashboard-suojaus | **Kyllä** |
 | `OPENAI_API_KEY` | AI-agentti (gpt-4o-mini) | Ei – mock fallback |
 | `MARKET_DATA_API_KEY` | Markkinahinnat (Twelve Data) | Ei – mock fallback |
 | `MARKETAUX_API_KEY` | Uutiset (Marketaux) | Ei – mock fallback |
@@ -34,6 +76,7 @@ Valuuttakurssit haetaan server-puolella ECB:n euro foreign exchange reference ra
 1. Push repo GitHubiin
 2. Luo uusi projekti Vercelissä (Import Git Repository)
 3. Lisää env-muuttujat Vercel-projektin Settings → Environment Variables:
+   - `APP_PASSWORD` ← **tämä ensin**
    - `OPENAI_API_KEY`
    - `MARKET_DATA_API_KEY`
    - `MARKETAUX_API_KEY`

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { checkAuth } from "@/lib/auth/server";
 
 export type ApiKeyStatus = "configured" | "missing";
 
@@ -8,7 +9,10 @@ export interface ConfigStatusResponse {
   marketaux: ApiKeyStatus;
 }
 
-export async function GET(): Promise<NextResponse<ConfigStatusResponse>> {
+export async function GET(): Promise<NextResponse<ConfigStatusResponse | { error: string }>> {
+  if (!(await checkAuth())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     return NextResponse.json({
       openai: process.env.OPENAI_API_KEY ? "configured" : "missing",

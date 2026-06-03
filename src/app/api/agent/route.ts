@@ -4,6 +4,7 @@ import OpenAI from "openai";
 import { getMockAgentResponse } from "@/lib/agent/mockResponses";
 import { formatContextForPrompt } from "@/lib/agent/prompt";
 import type { AgentContext } from "@/lib/agent/types";
+import { checkAuth } from "@/lib/auth/server";
 
 const SYSTEM_PROMPT = `Olet Investment OS -sovelluksen sijoitusagentti. Tehtäväsi on auttaa käyttäjää analysoimaan omaa sijoitusdashboardiaan.
 
@@ -101,7 +102,11 @@ function isValidBody(body: unknown): body is AgentRequestBody {
 
 export async function POST(
   request: NextRequest
-): Promise<NextResponse<AgentResponseBody>> {
+): Promise<NextResponse<AgentResponseBody | { error: string }>> {
+  if (!(await checkAuth())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   let body: unknown;
   try {
     body = await request.json();

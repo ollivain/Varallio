@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getServerNews } from "@/lib/news/serverProvider";
 import type { NewsProviderResult } from "@/lib/news/types";
+import { checkAuth } from "@/lib/auth/server";
 
 function normalizeTickers(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
@@ -27,7 +28,10 @@ const FALLBACK_RESULT: NewsProviderResult = {
   source: "mock",
 };
 
-export async function GET(request: NextRequest): Promise<NextResponse<NewsProviderResult>> {
+export async function GET(request: NextRequest): Promise<NextResponse<NewsProviderResult | { error: string }>> {
+  if (!(await checkAuth())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const result = await getServerNews(readTickersFromUrl(request));
     return NextResponse.json(result);
@@ -40,7 +44,11 @@ export async function GET(request: NextRequest): Promise<NextResponse<NewsProvid
   }
 }
 
-export async function POST(request: NextRequest): Promise<NextResponse<NewsProviderResult>> {
+export async function POST(request: NextRequest): Promise<NextResponse<NewsProviderResult | { error: string }>> {
+  if (!(await checkAuth())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   let body: unknown = null;
 
   try {

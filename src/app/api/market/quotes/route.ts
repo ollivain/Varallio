@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getServerMarketQuotes } from "@/lib/market/serverProvider";
 import type { MarketDataResult } from "@/lib/market/types";
+import { checkAuth } from "@/lib/auth/server";
 
 interface QuotesResponseBody extends MarketDataResult {
   source: "api" | "mock";
@@ -19,7 +20,11 @@ function isValidBody(body: unknown): body is { tickers: string[] } {
 
 export async function POST(
   request: NextRequest
-): Promise<NextResponse<QuotesResponseBody>> {
+): Promise<NextResponse<QuotesResponseBody | { error: string }>> {
+  if (!(await checkAuth())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   let body: unknown;
   try {
     body = await request.json();
